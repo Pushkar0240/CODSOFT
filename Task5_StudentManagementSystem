@@ -1,0 +1,140 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+class Student {
+    String name;
+    int roll;
+    String grade;
+
+    Student(String name, int roll, String grade) {
+        this.name = name;
+        this.roll = roll;
+        this.grade = grade;
+    }
+
+    public String toString() {
+        return "Name: " + name + ", Roll: " + roll + ", Grade: " + grade;
+    }
+}
+
+public class StudentManagementGUI {
+    private ArrayList<Student> students = new ArrayList<>();
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new StudentManagementGUI().createGUI());
+    }
+
+    public void createGUI() {
+        JFrame frame = new JFrame("Student Management System");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 450);
+        frame.setLayout(new GridLayout(6, 1, 10, 10));
+
+        JButton addBtn = new JButton("Add Student");
+        JButton viewBtn = new JButton("View All Students");
+        JButton searchBtn = new JButton("Search Student by Roll");
+        JButton deleteBtn = new JButton("Delete Student");
+        JButton exitBtn = new JButton("Exit");
+
+        frame.add(new JLabel("Student Management System", JLabel.CENTER));
+        frame.add(addBtn);
+        frame.add(viewBtn);
+        frame.add(searchBtn);
+        frame.add(deleteBtn);
+        frame.add(exitBtn);
+
+        // Action Listeners
+        addBtn.addActionListener(e -> addStudent());
+        viewBtn.addActionListener(e -> viewStudents());
+        searchBtn.addActionListener(e -> searchStudent());
+        deleteBtn.addActionListener(e -> deleteStudent());
+        exitBtn.addActionListener(e -> System.exit(0));
+
+        frame.setLocationRelativeTo(null); // Center on screen
+        frame.setVisible(true);
+    }
+
+    private void addStudent() {
+        JTextField nameField = new JTextField();
+        JTextField rollField = new JTextField();
+        JTextField gradeField = new JTextField();
+
+        Object[] input = {
+            "Name:", nameField,
+            "Roll Number:", rollField,
+            "Grade:", gradeField
+        };
+
+        int result = JOptionPane.showConfirmDialog(null, input, "Add Student", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String name = nameField.getText();
+                int roll = Integer.parseInt(rollField.getText());
+                String grade = gradeField.getText();
+
+                students.add(new Student(name, roll, grade));
+                JOptionPane.showMessageDialog(null, "✅ Student added successfully.");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "❌ Invalid input. Please try again.");
+            }
+        }
+    }
+
+    private void viewStudents() {
+        if (students.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No student records available.");
+            return;
+        }
+
+        StringBuilder all = new StringBuilder();
+        for (Student s : students) {
+            all.append(s.toString()).append("\n");
+        }
+
+        JTextArea textArea = new JTextArea(all.toString());
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(350, 200));
+
+        JOptionPane.showMessageDialog(null, scrollPane, "All Students", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void searchStudent() {
+        String input = JOptionPane.showInputDialog("Enter Roll Number to Search:");
+        if (input == null) return;
+
+        try {
+            int roll = Integer.parseInt(input);
+            for (Student s : students) {
+                if (s.roll == roll) {
+                    JOptionPane.showMessageDialog(null, s.toString(), "Student Found", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Student not found.");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid roll number.");
+        }
+    }
+
+    private void deleteStudent() {
+        String input = JOptionPane.showInputDialog("Enter Roll Number to Delete:");
+        if (input == null) return;
+
+        try {
+            int roll = Integer.parseInt(input);
+            for (Student s : students) {
+                if (s.roll == roll) {
+                    students.remove(s);
+                    JOptionPane.showMessageDialog(null, "Student deleted.");
+                    return;
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Student not found.");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid roll number.");
+        }
+    }
+}
